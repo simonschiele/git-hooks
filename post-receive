@@ -17,7 +17,7 @@ sendEmail=$(git config --bool hooks.sendEmail)
 
 if [ "$publishHomeRepo" == "true" ]
 then
-    . hooks/post-receive_publish-home-repo
+    . hooks/publish-home-repo
 fi
 
 if [ "$sendEmail" == "true" ]
