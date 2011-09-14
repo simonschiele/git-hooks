@@ -15,7 +15,7 @@ cd ..
 git clone -q public_home.git/ public_home_tmp2.git/
 
 cd public_home_tmp.git/
-cp -rf .bashrc .config/clipit/clipitrc .gitmodule .gitconfig .gitignore .gitmodules .icc .ssh .vim .vimrc .xscreensaver .xsession ../public_home_tmp2.git/
+cp -rf .bashrc .config/clipit/clipitrc .gitconfig .gitignore .gitmodules .icc .ssh .vim .vimrc .xscreensaver .xsession ../public_home_tmp2.git/
 cd ..
 
 cd public_home_tmp2.git/
