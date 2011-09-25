@@ -14,14 +14,14 @@ non-executable files:
 To activate the hooks, use something like this in your repos config file:
 
 [hook]
-    warnInvalidXml = (true|false)
-    blockInvalidXml = (true|false)
-    warnInvalidPHPSyntax = (true|false)
-    blockInvalidPHPSyntax = (true|false)
-    publishHomeRepo = (true|false)
-    deployOnTag = (true|false)
-    deployOnPush = (true|false)
-    sendEmail = (true|false)
+    warnInvalidXml = false
+    blockInvalidXml = false
+    warnInvalidPHPSyntax = false
+    blockInvalidPHPSyntax = false
+    publishHomeRepo = false
+    deployOnTag = false
+    deployOnPush = false
+    sendEmail = false
 
 Overview:
     * = shellscript in this repo
