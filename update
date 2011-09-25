@@ -81,7 +81,9 @@ case "$refname","$newrev_type" in
 		# annotated tag
 		;;
 	refs/heads/*,commit)
-		echo "normal commit"
+		if [ "$warnInvalidPHPSyntax" == "true" ]; then
+		    . hooks/warnInvalidPHPSyntax    
+        fi
 		;;
 	refs/heads/*,delete)
 		# delete branch
