@@ -1,7 +1,5 @@
 #!/bin/sh
 #
-# An example hook script for the post-receive event
-#
 # This script is run after receive-pack has accepted a pack and the
 # repository has been updated.  It is passed arguments in through stdin
 # in the form
@@ -9,15 +7,25 @@
 # For example:
 #  aa453216d1b3e49e7f6f98441fa56946ddcd6a20 68f7abf4e6f922807889f52bc043ecd31b79f814 refs/heads/master
 #
-# see contrib/hooks/ for an sample, or uncomment the next line (on debian)
-#
 
 publishHomeRepo=$(git config --bool hooks.publishHomeRepo)
 sendEmail=$(git config --bool hooks.sendEmail)
+deployOnTag=$(git config --bool hooks.deployOnTag)
+deployOnPush=$(git config --bool hooks.deployOnPush)
+
+if [ "$deployOnTag" == "true" ]
+then
+    . hooks/deployOnTag
+fi
+
+if [ "$deployOnPush" == "true" ]
+then
+    . hooks/deployOnPush
+fi
 
 if [ "$publishHomeRepo" == "true" ]
 then
-    . hooks/publish-home-repo
+    . hooks/publishHomeRepo
 fi
 
 if [ "$sendEmail" == "true" ]

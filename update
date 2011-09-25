@@ -40,6 +40,10 @@ fi
 allowunannotated=$(git config --bool hooks.allowunannotated)
 allowdeletebranch=$(git config --bool hooks.allowdeletebranch)
 allowdeletetag=$(git config --bool hooks.allowdeletetag)
+warnInvalidXml=$(git config --bool hooks.warnInvalidXml)
+blockInvalidXml=$(git config --bool hooks.blockInvalidXml)
+warnInvalidPHPSyntax=$(git config --bool hooks.warnInvalidPHPSyntax)
+blockInvalidPHPSyntax=$(git config --bool hooks.blockInvalidPHPSyntax)
 
 # check for no description
 projectdesc=$(sed -e '1q' "$GIT_DIR/description")
@@ -77,7 +81,7 @@ case "$refname","$newrev_type" in
 		# annotated tag
 		;;
 	refs/heads/*,commit)
-		# branch
+		echo "normal commit"
 		;;
 	refs/heads/*,delete)
 		# delete branch
@@ -88,6 +92,7 @@ case "$refname","$newrev_type" in
 		;;
 	refs/remotes/*,commit)
 		# tracking branch
+		echo "normal commit 2"
 		;;
 	refs/remotes/*,delete)
 		# delete tracking branch
