@@ -37,7 +37,7 @@ then
     else
         echo >&2
         echo -e "${Red}$warnings files with possible invalid XML${Normal}\n" >&2
-        if [ "$blockInvalidXml" = "true" ]
+        if [ "$blockInvalidXML" = "true" ]
         then
             echo -e "${Red}PULL REJECTED${Normal}" >&2
             exit 1
