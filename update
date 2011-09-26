@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # An example hook script to blocks unannotated tags from entering.
 # Called by git-receive-pack with arguments: refname sha1-old sha1-new
@@ -45,6 +45,9 @@ blockInvalidXml=$(git config --bool hooks.blockInvalidXml)
 warnInvalidPHPSyntax=$(git config --bool hooks.warnInvalidPHPSyntax)
 blockInvalidPHPSyntax=$(git config --bool hooks.blockInvalidPHPSyntax)
 
+# colors 
+. hooks/functions.sh
+
 # check for no description
 projectdesc=$(sed -e '1q' "$GIT_DIR/description")
 if [ -z "$projectdesc" -o "$projectdesc" = "Unnamed repository; edit this file to name it for gitweb." ]; then
@@ -81,9 +84,12 @@ case "$refname","$newrev_type" in
 		# annotated tag
 		;;
 	refs/heads/*,commit)
-		if [ "$warnInvalidPHPSyntax" == "true" ]; then
-		    . hooks/warnInvalidPHPSyntax    
-        fi
+		
+        # warn/block on invalid PHP Syntax
+        if [ "$warnInvalidPHPSyntax" = "true" ] || [ "$blockInvalidPHPSyntax" = "true" ] 
+        then
+            . hooks/phpSyntax 
+		fi
 		;;
 	refs/heads/*,delete)
 		# delete branch

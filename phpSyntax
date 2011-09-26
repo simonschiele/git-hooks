@@ -1,0 +1,38 @@
+#!/bin/bash
+
+warnings=0
+echo -e "\nPHP Syntax Tests:" >&2
+
+ORIGINAL_IFS=$IFS
+IFS=$'\n'
+for sourcefile in $( git diff-tree -r ${oldrev}..${newrev} | awk {'print substr($0, index($0,$6))'} )
+do
+    for extension in "php" "phtml" "php3" "php4" "php5"
+    do
+        if [ "${sourcefile##*.}" = "$extension" ]
+        then
+            if ( git show ${newrev}:"${sourcefile}" 2>/dev/null >&2 ) && \
+               ! ( git show ${newrev}:"${sourcefile}" | php -l 2>/dev/null >&2 ) 
+            then
+                warnings=$(( $warnings + 1 ))
+                echo >&2
+                echo $( git show ${newrev}:"${sourcefile}" | php -l) "${sourcefile}" >&2 
+            fi
+        fi
+    done
+done
+IFS=$ORIGINAL_IFS
+
+if [ $warnings -eq 0 ]
+then
+    echo -e "${Green}Everything OK${Normal}\n"
+else
+    echo >&2
+    echo -e "${Red}$warnings PHP files with possible broken syntax found in this commit${Normal}\n" >&2
+    if [ "$blockInvalidPHPSyntax" = "true" ]
+    then
+        echo "${Red}PULL REJECTED${Normal}" >&2
+        exit 1
+    fi
+fi
+
