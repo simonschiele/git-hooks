@@ -17,12 +17,12 @@ do
                 found=true
             fi
             if ( git show ${newrev}:"${sourcefile}" 2>/dev/null >&2 ) && \
-               ! ( git show ${newrev}:"${sourcefile}" | xmllint --debug - 2>/dev/null >&2 ) 
+               ! ( git show ${newrev}:"${sourcefile}" | xmllint - 2>/dev/null >&2 ) 
             then
                 warnings=$(( $warnings + 1 ))
                 echo >&2
                 echo "${Red}Invalid xml in ${sourcefile}${$Normal}"
-                git show ${newrev}:"${sourcefile}" | xmllint --debug - >&2
+                git show ${newrev}:"${sourcefile}" | xmllint - >&2
             fi
         fi
     done
