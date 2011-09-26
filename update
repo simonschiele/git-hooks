@@ -37,13 +37,13 @@ if [ -z "$refname" -o -z "$oldrev" -o -z "$newrev" ]; then
 fi
 
 # --- Config
-allowunannotated=$(git config --bool hooks.allowunannotated)
-allowdeletebranch=$(git config --bool hooks.allowdeletebranch)
-allowdeletetag=$(git config --bool hooks.allowdeletetag)
-warnInvalidXml=$(git config --bool hooks.warnInvalidXml)
-blockInvalidXml=$(git config --bool hooks.blockInvalidXml)
-warnInvalidPHPSyntax=$(git config --bool hooks.warnInvalidPHPSyntax)
-blockInvalidPHPSyntax=$(git config --bool hooks.blockInvalidPHPSyntax)
+allowunannotated=$(git config --bool hook.allowunannotated)
+allowdeletebranch=$(git config --bool hook.allowdeletebranch)
+allowdeletetag=$(git config --bool hook.allowdeletetag)
+warnInvalidXml=$(git config --bool hook.warnInvalidXml)
+blockInvalidXml=$(git config --bool hook.blockInvalidXml)
+warnInvalidPHPSyntax=$(git config --bool hook.warnInvalidPHPSyntax)
+blockInvalidPHPSyntax=$(git config --bool hook.blockInvalidPHPSyntax)
 
 # colors 
 . hooks/functions.sh

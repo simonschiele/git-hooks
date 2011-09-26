@@ -31,7 +31,7 @@ else
     echo -e "${Red}$warnings PHP files with possible broken syntax found in this commit${Normal}\n" >&2
     if [ "$blockInvalidPHPSyntax" = "true" ]
     then
-        echo "${Red}PULL REJECTED${Normal}" >&2
+        echo -e "${Red}PULL REJECTED${Normal}" >&2
         exit 1
     fi
 fi
