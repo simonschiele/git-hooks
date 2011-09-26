@@ -40,8 +40,8 @@ fi
 allowunannotated=$(git config --bool hook.allowunannotated)
 allowdeletebranch=$(git config --bool hook.allowdeletebranch)
 allowdeletetag=$(git config --bool hook.allowdeletetag)
-warnInvalidXml=$(git config --bool hook.warnInvalidXml)
-blockInvalidXml=$(git config --bool hook.blockInvalidXml)
+warnInvalidXML=$(git config --bool hook.warnInvalidXML)
+blockInvalidXML=$(git config --bool hook.blockInvalidXML)
 warnInvalidPHPSyntax=$(git config --bool hook.warnInvalidPHPSyntax)
 blockInvalidPHPSyntax=$(git config --bool hook.blockInvalidPHPSyntax)
 
@@ -90,7 +90,7 @@ case "$refname","$newrev_type" in
             . hooks/phpSyntax
 		fi
         # warn/block on invalid xml 
-        if [ "$warnInvalidXml" = "true" ] || [ "$blockInvalidXml" = "true" ] 
+        if [ "$warnInvalidXML" = "true" ] || [ "$blockInvalidXML" = "true" ] 
         then
             . hooks/xmlValidate
 		fi
