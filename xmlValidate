@@ -7,21 +7,22 @@ ORIGINAL_IFS=$IFS
 IFS=$'\n'
 for sourcefile in $( git diff-tree -r ${oldrev}..${newrev} | awk {'print substr($0, index($0,$6))'} )
 do
-    for extension in "php" "phtml" "php3" "php4" "php5"
+    for extension in "xml"
     do
         if [ "${sourcefile##*.}" = "$extension" ]
         then
             if [ "$found" = "false" ]
             then
-                echo -e "\nPHP Syntax Tests:" >&2
+                echo -e "\nXML Validation:" >&2
                 found=true
             fi
             if ( git show ${newrev}:"${sourcefile}" 2>/dev/null >&2 ) && \
-               ! ( git show ${newrev}:"${sourcefile}" | php -l 2>/dev/null >&2 ) 
+               ! ( git show ${newrev}:"${sourcefile}" | xmllint --debug - 2>/dev/null >&2 ) 
             then
                 warnings=$(( $warnings + 1 ))
                 echo >&2
-                echo $( git show ${newrev}:"${sourcefile}" | php -l) "${sourcefile}" >&2 
+                echo "${Red}Invalid xml in ${sourcefile}${$Normal}"
+                git show ${newrev}:"${sourcefile}" | xmllint --debug - >&2
             fi
         fi
     done
@@ -35,8 +36,8 @@ then
         echo -e "${Green}Everything OK${Normal}\n"
     else
         echo >&2
-        echo -e "${Red}$warnings PHP files with possible broken syntax found in this commit${Normal}\n" >&2
-        if [ "$blockInvalidPHPSyntax" = "true" ]
+        echo -e "${Red}$warnings files with possible invalid XML${Normal}\n" >&2
+        if [ "$blockInvalidXml" = "true" ]
         then
             echo -e "${Red}PULL REJECTED${Normal}" >&2
             exit 1

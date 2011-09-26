@@ -84,11 +84,15 @@ case "$refname","$newrev_type" in
 		# annotated tag
 		;;
 	refs/heads/*,commit)
-		
         # warn/block on invalid PHP Syntax
         if [ "$warnInvalidPHPSyntax" = "true" ] || [ "$blockInvalidPHPSyntax" = "true" ] 
         then
-            . hooks/phpSyntax 
+            . hooks/phpSyntax
+		fi
+        # warn/block on invalid xml 
+        if [ "$warnInvalidXml" = "true" ] || [ "$blockInvalidXml" = "true" ] 
+        then
+            . hooks/xmlValidate
 		fi
 		;;
 	refs/heads/*,delete)
