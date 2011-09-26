@@ -13,22 +13,22 @@ sendEmail=$(git config --bool hooks.sendEmail)
 deployOnTag=$(git config --bool hooks.deployOnTag)
 deployOnPush=$(git config --bool hooks.deployOnPush)
 
-if [ "$deployOnTag" == "true" ]
+if [ "$deployOnTag" = "true" ]
 then
     . hooks/deployOnTag
 fi
 
-if [ "$deployOnPush" == "true" ]
+if [ "$deployOnPush" = "true" ]
 then
     . hooks/deployOnPush
 fi
 
-if [ "$publishHomeRepo" == "true" ]
+if [ "$publishHomeRepo" = "true" ]
 then
     . hooks/publishHomeRepo
 fi
 
-if [ "$sendEmail" == "true" ]
+if [ "$sendEmail" = "true" ]
 then
     . hooks/post-receive_email
 fi
