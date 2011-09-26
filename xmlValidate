@@ -21,7 +21,7 @@ do
             then
                 warnings=$(( $warnings + 1 ))
                 echo >&2
-                echo "${Red}Invalid xml in ${sourcefile}${$Normal}"
+                echo "${Red}Invalid xml in ${sourcefile}${Normal}"
                 git show ${newrev}:"${sourcefile}" | xmllint - >&2
             fi
         fi
