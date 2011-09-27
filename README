@@ -14,8 +14,8 @@ non-executable files:
 To activate the hooks, use something like this in your repos config file:
 
 [hook]
-    warnInvalidXml = false
-    blockInvalidXml = false
+    warnInvalidXML = false
+    blockInvalidXML = false
     warnInvalidPHPSyntax = false
     blockInvalidPHPSyntax = false
     publishHomeRepo = false
@@ -24,13 +24,12 @@ To activate the hooks, use something like this in your repos config file:
     sendEmail = false
 
 Overview:
-    * = shellscript in this repo
-
-    warnInvalidXml
+    
+    warnInvalidXML
         Depends: xmllint
         Description: Gives warning on push if there is some invalid xml
 
-    blockInvalidXml
+    blockInvalidXML
         Depends: xmllint
         Description: forbid push if there is some invalid xml 
     
@@ -45,7 +44,7 @@ Overview:
                      files with *.php* or *.phtml extension.
 
     publishHomeRepo:
-        Depends: publish-home-repo (shell script, included in this repo)
+        Depends: 
         Description: specific script to export a cleaned version of my home repo.
                      maybe usable as example.
 
