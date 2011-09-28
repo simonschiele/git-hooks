@@ -44,7 +44,6 @@ Overview:
                      files with *.php* or *.phtml extension.
 
     publishHomeRepo:
-        Depends: 
         Description: specific script to export a cleaned version of my home repo.
                      maybe usable as example.
 
@@ -57,7 +56,8 @@ Overview:
         Description: deploy to configured hosts on push
 
     sendEmail:
-        Depends: post-receive_email (shell script, included in this repo)
-
+        Example script, I just added the switch for.
+        For doc, have a look at the post-receive_email scipt.
+        It's well commented.
 
 
