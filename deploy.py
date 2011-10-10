@@ -22,3 +22,14 @@ def deploy_via_mercurial(deploypath=None):
         with cd(deploypath):
             run('hg pull')
 
+def deploy_remote(hostname=None,key=None)
+    if not hoststring:
+        print "Error: Please give hoststring as first parameter"
+    elif not key:
+        print "Error: Please sepcify ssh key for deploy as second parameter"
+    else:
+        run('eval `ssh-agent`')
+        run('ssh-add %s' % (key,))
+        run('ssh -l deploy %s "echo -n"' % (hostname,))
+        run('kill -9 $SSH_AGENT_PID')
+
