@@ -18,9 +18,17 @@ To activate the hooks, use something like this in your repos config file:
     blockInvalidXML = false
     warnInvalidPHPSyntax = false
     blockInvalidPHPSyntax = false
-    publishHomeRepo = false
+    warnExtension = false
+    warnExtensionTypes = "doc,xls"
+    warnExtensionMsg = "bla bla"
+    blockExtension = false
+    blockExtensionTypes = "doc,xls"
+    blockExtensionMsg = "bla bla"
     deployOnTag = false
+    deployOnTagTargets = "local@/var/www/bla"
     deployOnPush = false
+    deployOnPushTargets = "local@/var/www/bla,/etc/ssh-keys/deployKey23@testserver.com"
+    publishHomeRepo = false
     sendEmail = false
 
 Overview:
@@ -42,22 +50,57 @@ Overview:
         Depends: php-cli
         Description: Forbid push if there are syntax errors in php code in 
                      files with *.php* or *.phtml extension.
+    
+    warnExtension
+        Description: Gives warning on push, if there are files with unwanted
+                     extension in a commit set. A Message can be configured also.
+        Depends Config:     warnExtensionTypes = "doc,xls,ppt"
+        Optional Config:    warnExtensionMsg = "A commit of yours includes a @filetype@-file. Please don't do that. It's nasty."
+
+    blockExtension
+        Description: Forbid to push, if there are files with unwanted extensions 
+                     in a commit set. A Message can be configured also.
+        Depends Config:     blockExtensionTypes = "doc,xls,ppt"
+        Optional Config:    blockExtensionMsg = "Commit Blocked! @filetype@-file included!"
+    
+    deployOnTag:
+        Description: deploys locally or to configured hosts on a pushed tag
+                     For remote deploy, have a look at the note on foot of this document.
+        Depends Config: deployOnTagTargets = "local@/usr/local/src/repo1,/home/user/.ssh/id_rsa@remotehostname"
+
+    deployOnPush:
+        Description: deploys locally or to configured hosts on push
+                     For remote deploy, have a look at the note on foot of this document.
+        Depends Config: deployOnPushTargets = "local@/usr/local/src/repo1,/home/user/.ssh/id_rsa@remotehostname"
+
 
     publishHomeRepo:
         Description: specific script to export a cleaned version of my home repo.
                      maybe usable as example.
 
-    deployOnTag:
-        Depends: python-fabric
-        Description: deploys to configured hosts on a pushed tag
-
-    deployOnPush:
-        Depends: python-fabric
-        Description: deploy to configured hosts on push
-
     sendEmail:
         Example script, I just added the switch for.
         For doc, have a look at the post-receive_email scipt.
-        It's well commented.
+        It's well commented and a great example for all kind of hooks.
 
+
+####################################
+About remote deploying
+####################################
+The deploy hooks rely on a configured remote host.
+
+My default setup on remote host:
+    * I create a passwordless user named "deploy"
+    * give him his home-dir as /var/cache/deploy
+    * create a ssh keypair for git pull
+    * put private key in /var/cache/deploy/.ssh/
+    * add public key with read permissions to gitlolite/gitosis
+    * create another key pair for actuall deploy
+    * put private key on the server that triggers the git-hook
+    * add public key to /var/cache/deploy/.ssh/authorized_keys with something like this:
+command="cd /srv/www/page1 && echo "Deploying to $(pwd) on $(hostname)" && git pull",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AA......... deploy@host
+
+Sadly, you can only bind one deploy to one key, so you will have to create a lot of deploy keys. 
+On the plus side, this will enhance seucurity of the deploy model and at least you can reuse the key for git read permissions.
+If you are using git to deploy web projects, be carefull that git directory is blocked by apache or outside of htdocs.
 

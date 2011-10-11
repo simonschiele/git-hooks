@@ -8,19 +8,74 @@
 #  aa453216d1b3e49e7f6f98441fa56946ddcd6a20 68f7abf4e6f922807889f52bc043ecd31b79f814 refs/heads/master
 #
 
+deployOnTag=$(git config --bool hooks.deployOnTag)
+deployOnTagTargets=$(git config hooks.deployOnTagTargets)
+deployOnPush=$(git config --bool hooks.deployOnPush)
+deployOnPushTargets=$(git config hooks.deployOnPushTargets)
 publishHomeRepo=$(git config --bool hooks.publishHomeRepo)
 sendEmail=$(git config --bool hooks.sendEmail)
-deployOnTag=$(git config --bool hooks.deployOnTag)
-deployOnPush=$(git config --bool hooks.deployOnPush)
+
+deploy() {
+    if [ ${1} = "local" ]
+    then
+        cd "${2}"
+        git pull
+    elif [ ! -r ${1} ]
+    then
+        echo "Error: Could not read deploy key ${$1}"  
+    else
+        eval `ssh-agent`
+        ssh-add ${1} 
+        ssh -l deploy ${2} "echo -n" 
+        kill -9 $SSH_AGENT_PID
+    fi
+}
 
 if [ "$deployOnTag" = "true" ]
 then
-    . hooks/deployOnTag
+    if [ -n "$deployOnTagTargets" ] || ! ( echo "$deployOnTagTargets" | grep -q "@" )
+    then
+        echo "Error while executing deployOnTag hook:"
+        echo "Please define valid deployOnTagTargets in the repo config files. See README for help and example."
+        exit 1
+    fi
+
+    delpoyOnTagTargets=$( echo "$delpoyOnTagTargets" | sed "s|,| |g" )
+    for nextTarget in $delpoyOnTagTargets
+    do
+        type=$( echo "$nextTarget" | cut -f"1" -d"@" )
+        where=$( echo "$nextTarget" | cut -f"2" -d"@" )
+        
+        echo deploy "$type" "$where"
+
+        i=$(( $i + 1 ))
+        nextTarget=$( echo "$deployOnTagTargets" | cut -f"${i}" -d"," )
+    done
 fi
 
 if [ "$deployOnPush" = "true" ]
 then
-    . hooks/deployOnPush
+    if [ -n "$deployOnPushTargets" ] || ! ( echo "$deployOnTagTargets" | grep -q "@" )
+    then
+        echo "Error while executing deployOnPush hook:"
+        echo "Please define valid deployOnTagTargets in the repo config files. See README for help and example."
+        exit 1
+    fi
+    
+    . hooks/deploy.sh
+
+    i=1
+    nextTarget=$( echo "$deployOnPushTargets" | cut -f"${i}" -d"," )
+    while [ -n "$nextTarget" ]
+    do
+        type=$( echo "$nextTarget" | cut -f"1" -d"@" )
+        where=$( echo "$nextTarget" | cut -f"2" -d"@" )
+        
+        deploy "$type" "$where"
+
+        i=$(( $i + 1 ))
+        nextTarget=$( echo "$deployOnPushTargets" | cut -f"${i}" -d"," )
+    done
 fi
 
 if [ "$publishHomeRepo" = "true" ]

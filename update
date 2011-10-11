@@ -44,9 +44,15 @@ warnInvalidXML=$(git config --bool hook.warnInvalidXML)
 blockInvalidXML=$(git config --bool hook.blockInvalidXML)
 warnInvalidPHPSyntax=$(git config --bool hook.warnInvalidPHPSyntax)
 blockInvalidPHPSyntax=$(git config --bool hook.blockInvalidPHPSyntax)
+warnExtension=$(git config --bool hook.warnExtension)
+warnExtensionTypes=$(git config hook.warnExtensionTypes)
+warnExtensionMsg=$(git config hook.warnExtensionMsg)
+blockExtension=$(git config --bool hook.blockExtension)
+blockExtensionTypes=$(git config hook.blockExtensionTypes)
+blockExtensionMsg=$(git config hook.blockExtensionMsg)
 
 # colors 
-. hooks/functions.sh
+. hooks/colors.sh
 
 # check for no description
 projectdesc=$(sed -e '1q' "$GIT_DIR/description")
@@ -89,11 +95,19 @@ case "$refname","$newrev_type" in
         then
             . hooks/phpSyntax
 		fi
+        
         # warn/block on invalid xml 
         if [ "$warnInvalidXML" = "true" ] || [ "$blockInvalidXML" = "true" ] 
         then
             . hooks/xmlValidate
 		fi
+        
+        # warn/block on forbidden extensions 
+        if [ "$warnExtension" = "true" ] || [ "$blockExtension" = "true" ] 
+        then
+            . hooks/checkExtension
+		fi
+
 		;;
 	refs/heads/*,delete)
 		# delete branch
