@@ -58,7 +58,7 @@ then
     if [ -n "$deployOnPushTargets" ] || ! ( echo "$deployOnTagTargets" | grep -q "@" )
     then
         echo "Error while executing deployOnPush hook:"
-        echo "Please define valid deployOnTagTargets in the repo config files. See README for help and example."
+        echo "Please define valid deployOnPushTargets in the repo config files. See README for help and example."
         exit 1
     fi
     
