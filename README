@@ -25,9 +25,9 @@ To activate the hooks, use something like this in your repos config file:
     blockExtensionTypes = "doc,xls"
     blockExtensionMsg = "bla bla"
     deployOnTag = false
-    deployOnTagTargets = "local@/var/www/bla"
+    deployOnTagTargets = local@/var/www/bla
     deployOnPush = false
-    deployOnPushTargets = "local@/var/www/bla,/etc/ssh-keys/deployKey23@testserver.com"
+    deployOnPushTargets = local@/var/www/bla,/etc/ssh-keys/deployKey23@testserver.com
     publishHomeRepo = false
     sendEmail = false
 
@@ -89,18 +89,20 @@ About remote deploying
 ####################################
 The deploy hooks rely on a configured remote host.
 
+The actual deploy script is configures in the authorized_keys of your deploy user - on hook side only "echo -n" gets triggered.
+Sadly, you can only bind one deploy to one key, so you will have to create a lot of deploy keys. 
+On the plus side, this will enhance seucurity of the deploy model. Anyway, think about clean permissions before start using auto 
+deploy.
+If you are using git to deploy web projects, be carefull that git directory is blocked by apache or outside of htdocs.
+
 My default setup on remote host:
     * I create a passwordless user named "deploy"
     * give him his home-dir as /var/cache/deploy
     * create a ssh keypair for git pull
     * put private key in /var/cache/deploy/.ssh/
     * add public key with read permissions to gitlolite/gitosis
-    * create another key pair for actuall deploy
+    * create another key pair for actual deploy
     * put private key on the server that triggers the git-hook
     * add public key to /var/cache/deploy/.ssh/authorized_keys with something like this:
-command="cd /srv/www/page1 && echo "Deploying to $(pwd) on $(hostname)" && git pull",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AA......... deploy@host
-
-Sadly, you can only bind one deploy to one key, so you will have to create a lot of deploy keys. 
-On the plus side, this will enhance seucurity of the deploy model and at least you can reuse the key for git read permissions.
-If you are using git to deploy web projects, be carefull that git directory is blocked by apache or outside of htdocs.
+command="cd /srv/www/page1 && echo Deploying to $(pwd) on $(hostname) && git pull",no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa AA......... deploy@host
 
