@@ -87,6 +87,7 @@ Overview:
 ####################################
 About remote deploying
 ####################################
+
 The deploy hooks rely on a configured remote host.
 
 The actual deploy script is configures in the authorized_keys of your deploy user - on hook side only "echo -n" gets triggered.
