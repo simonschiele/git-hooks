@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # This script is run after receive-pack has accepted a pack and the
 # repository has been updated.  It is passed arguments in through stdin
@@ -15,66 +15,71 @@ deployOnPushTargets=$(git config hooks.deployOnPushTargets)
 publishHomeRepo=$(git config --bool hooks.publishHomeRepo)
 sendEmail=$(git config --bool hooks.sendEmail)
 
+# colors 
+[ -r hooks/colors.sh ] && . hooks/colors.sh
+
 deploy() {
     if [ ${1} = "local" ]
     then
+        echo -e "\nDeploying locally on $( hostname ) to '${2}'"
         cd "${2}"
-        git pull
+        unset GIT_DIR
+        if ( git pull )
+        then
+            echo -e "${Green}Deployed SUCCESSFUL${Normal}\n"
+        else
+            echo -e "${Red}Something went wrong. Please check repo state manually.${Normal}\n"
+        fi
     elif [ ! -r ${1} ]
     then
-        echo "Error: Could not read deploy key ${$1}"  
+        echo "${Red}Error:{$Normal} Could not read deploy key ${1}"  
     else
-        eval `ssh-agent`
-        ssh-add ${1} 
-        ssh -l deploy ${2} "echo -n" 
+        echo
+        eval `ssh-agent` >/dev/null 
+        ssh-add ${1} >/dev/null 2>&1
+        if ( ssh -o "StrictHostKeyChecking no" -l deploy ${2} "echo -n" )
+        then
+            echo -e "${Green}Deployed SUCCESSFUL${Normal}\n"
+        else
+            echo -e "${Red}Something went wrong. Please check repo state manually.${Normal}\n"
+        fi
         kill -9 $SSH_AGENT_PID
     fi
 }
 
 if [ "$deployOnTag" = "true" ]
 then
-    if [ -n "$deployOnTagTargets" ] || ! ( echo "$deployOnTagTargets" | grep -q "@" )
+    if [ -z "$deployOnTagTargets" ] || ! ( echo "$deployOnTagTargets" | grep -q "@" )
     then
         echo "Error while executing deployOnTag hook:"
         echo "Please define valid deployOnTagTargets in the repo config files. See README for help and example."
         exit 1
     fi
 
-    delpoyOnTagTargets=$( echo "$delpoyOnTagTargets" | sed "s|,| |g" )
     for nextTarget in $delpoyOnTagTargets
     do
         type=$( echo "$nextTarget" | cut -f"1" -d"@" )
         where=$( echo "$nextTarget" | cut -f"2" -d"@" )
         
-        echo deploy "$type" "$where"
-
-        i=$(( $i + 1 ))
-        nextTarget=$( echo "$deployOnTagTargets" | cut -f"${i}" -d"," )
+        deploy "$type" "$where"
     done
 fi
 
 if [ "$deployOnPush" = "true" ]
 then
-    if [ -n "$deployOnPushTargets" ] || ! ( echo "$deployOnTagTargets" | grep -q "@" )
+    if [ -z "$deployOnPushTargets" ] || ! ( echo "$deployOnPushTargets" | grep -q "@" )
     then
         echo "Error while executing deployOnPush hook:"
         echo "Please define valid deployOnPushTargets in the repo config files. See README for help and example."
         exit 1
     fi
     
-    . hooks/deploy.sh
-
-    i=1
-    nextTarget=$( echo "$deployOnPushTargets" | cut -f"${i}" -d"," )
-    while [ -n "$nextTarget" ]
+    for nextTarget in $( echo "$deployOnPushTargets" | sed "s|,| |g" )
     do
         type=$( echo "$nextTarget" | cut -f"1" -d"@" )
         where=$( echo "$nextTarget" | cut -f"2" -d"@" )
         
         deploy "$type" "$where"
-
-        i=$(( $i + 1 ))
-        nextTarget=$( echo "$deployOnPushTargets" | cut -f"${i}" -d"," )
     done
 fi
 
