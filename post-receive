@@ -8,6 +8,9 @@
 #  aa453216d1b3e49e7f6f98441fa56946ddcd6a20 68f7abf4e6f922807889f52bc043ecd31b79f814 refs/heads/master
 #
 
+read oldrev newrev refname
+
+pushToGitHub=$(git config --bool hooks.pushToGithub)
 deployOnTag=$(git config --bool hooks.deployOnTag)
 deployOnTagTargets=$(git config hooks.deployOnTagTargets)
 deployOnPush=$(git config --bool hooks.deployOnPush)
@@ -32,7 +35,7 @@ deploy() {
         fi
     elif [ ! -r ${1} ]
     then
-        echo "${Red}Error:{$Normal} Could not read deploy key ${1}"  
+        echo "${Red}Error:${Normal} Could not read deploy key ${1}"  
     else
         echo
         eval `ssh-agent` >/dev/null 
@@ -81,6 +84,11 @@ then
         
         deploy "$type" "$where"
     done
+fi
+
+if [ "$pushToGitHub" = "true" ]
+then
+    git push github ${refname:t}
 fi
 
 if [ "$publishHomeRepo" = "true" ]
