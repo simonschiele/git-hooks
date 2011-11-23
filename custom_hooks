@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Path to hooks
+hooks_path="/usr/local/share/git-hooks"
+
+# Colors for nice output
+Normal='\e[0m'
+Green='\e[0;32m'
+Yellow='\e[0;33m'
+Red='\e[0;31m'
+
+# Get infos from stdin
+read oldrev newrev refname
+
+# Load custom hooks, if available
+if [ -r "${hooks_path}/$( basename ${0} )" ]
+then
+    . ${hooks_path}/$( basename ${0} )
+fi
+
