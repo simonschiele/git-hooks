@@ -16,12 +16,16 @@ do
                 echo -e "\nPHP Syntax Tests:" >&2
                 found=true
             fi
+            echo -n "${sourcefile}"
             if ( git show ${newrev}:"${sourcefile}" 2>/dev/null >&2 ) && \
                ! ( git show ${newrev}:"${sourcefile}" | php -l 2>/dev/null >&2 ) 
             then
+                echo -e "\t\t${Red}Failed${Normal}"
                 warnings=$(( $warnings + 1 ))
                 echo >&2
                 echo $( git show ${newrev}:"${sourcefile}" | php -l) "${sourcefile}" >&2 
+            else
+                echo -e "\t\t${Green}Successful${Normal}"
             fi
         fi
     done
