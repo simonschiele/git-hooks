@@ -1,0 +1,144 @@
+#!/bin/bash
+
+validation=$(git config hook.validation | sed 's|,| |g' | sed 's|[ ]\+| |g')
+
+cmd_php="php -l"
+cmd_xml="xmllint -"
+cmd_py="pylint -E /dev/stdin"
+
+cmd_html="echo -n"
+cmd_css="echo -n"
+cmd_js="echo -n"
+
+NAME="pre-receive.validation"
+ORIGINAL_IFS=$IFS
+HOOK_STATUS=true
+
+call="$( basename ${0} )"
+if [ "${call}" = "${NAME}" ]
+then
+    echo "Please don't call this hook directly. It doesn't make sense."
+    echo "Use the 'custom_hooks' loader or source this script like this:'"
+    echo ". ./hooks/${call}"
+    echo "or"
+    echo "source /srv/git-hooks/${call}"
+    exit 1
+fi
+
+if [ "${validation}" = "" ] || [ "${validation}" = "false" ]
+then
+    exit 0
+fi
+
+affected_files()
+{
+    for extension in ${@}
+    do
+        for comitted_file in $( git diff-tree -r ${oldrev}..${newrev} | awk {'print substr($0, index($0,$6))'} )
+        do
+            if [ "${comitted_file##*.}" = "$extension" ]
+            then
+                echo "$comitted_file"
+            fi
+        done
+    done
+}
+
+commited_file()
+{
+    sourcefile="${1}"
+    git show ${newrev}:"${sourcefile}"
+}
+
+validate()
+{
+    module="${1}"
+    while read sourcefile
+    do
+        if ! ( commited_file "${sourcefile}" | eval \$cmd_${module} 2>/dev/null >&2 )
+        then
+            warnings=$(( $warnings + 1 ))
+            echo "false ${sourcefile}"
+        else
+            echo "true ${sourcefile}"
+        fi
+    done
+}
+
+action()
+{
+    module="${1}"
+    name="${2}"
+    
+    while read validation_status sourcefile
+    do
+        if ! ( $found )
+        then
+            echo -e "\n> ${name} Validation"
+            found=true
+        fi
+        
+        if ( $validation_status )
+        then
+            echo -e "${Green}[OK]${Normal}\t - ${sourcefile}"
+        else
+            echo -e "${Red}[FAILED]${Normal} - ${sourcefile}"
+        fi
+    done
+    
+    if ( $found )
+    then
+        echo
+    fi
+}
+
+for entry in $validation
+do
+    warnings=0
+    found=false
+
+    case "${entry}" in
+ 
+        php|phtml)
+            extensions=( php php3 php4 php5 phtml )
+            name="PHP Syntax"
+          ;;
+        
+        xml)
+            extensions=( xml )
+            name="XML"
+          ;;
+        
+        html)
+            extensions=( html )
+            name="HTML"
+          ;;
+        
+        py|python)
+            extensions=( py )
+            name="Python Syntax"
+          ;;
+        
+        js|javascript)
+            extensions=( js )
+            name="Javascript Syntax"
+          ;;
+        
+        css|stylesheets)
+            extensions=( css )
+            name="Stylesheet"
+          ;;
+
+        *)
+            echo "Error: No validation module for filetype: ${entry}"
+            exit 1
+          ;;
+    
+    esac
+    
+    affected_files ${extensions[@]} | validate "${extensions[0]}" | action "${extensions[0]}" "${name}" 
+
+done
+
+${HOOK_STATUS}
+
