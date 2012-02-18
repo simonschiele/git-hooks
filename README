@@ -1,87 +1,17 @@
-This repo is based on the default and example hooks the git project provides.
-Also I added a few of my own hooks. Have a look at the Overview at the bottom.
+These are a few of my git-hooks. Have a look at the Overview at the bottom.
 
-server side hooks:
-    post-/pre-receive
-    update
+To activate serverside hooks, 
+    1) get include "custom_hook"-hook  
+    2) to activate the hooks needed, use something like this in your repos config file:
 
-client side hooks:
-    all the others
+    [hook]
+        validation = xml, php 
 
-non-executable files:
-    scripts used by hooks
-
-To activate the hooks, use something like this in your repos config file:
-
-[hook]
-    warnInvalidXML = false
-    blockInvalidXML = false
-    warnInvalidPHPSyntax = false
-    blockInvalidPHPSyntax = false
-    warnExtension = false
-    warnExtensionTypes = "doc,xls"
-    warnExtensionMsg = "bla bla"
-    blockExtension = false
-    blockExtensionTypes = "doc,xls"
-    blockExtensionMsg = "bla bla"
-    deployOnTag = false
-    deployOnTagTargets = local@/var/www/bla
-    deployOnPush = false
-    deployOnPushTargets = local@/var/www/bla,/etc/ssh-keys/deployKey23@testserver.com
-    publishHomeRepo = false
-    sendEmail = false
 
 Overview:
     
-    warnInvalidXML
-        Depends: xmllint
-        Description: Gives warning on push if there is some invalid xml
-
-    blockInvalidXML
-        Depends: xmllint
-        Description: forbid push if there is some invalid xml 
-    
-    warnInvalidPHPSyntax
-        Depends: php-cli
-        Description: Gives warning on push if there are syntax errors in php 
-                     code in files with *.php* or *.phtml extension.
-
-    blockInvalidPHPSyntax
-        Depends: php-cli
-        Description: Forbid push if there are syntax errors in php code in 
-                     files with *.php* or *.phtml extension.
-    
-    warnExtension
-        Description: Gives warning on push, if there are files with unwanted
-                     extension in a commit set. A Message can be configured also.
-        Depends Config:     warnExtensionTypes = "doc,xls,ppt"
-        Optional Config:    warnExtensionMsg = "A commit of yours includes a @filetype@-file. Please don't do that. It's nasty."
-
-    blockExtension
-        Description: Forbid to push, if there are files with unwanted extensions 
-                     in a commit set. A Message can be configured also.
-        Depends Config:     blockExtensionTypes = "doc,xls,ppt"
-        Optional Config:    blockExtensionMsg = "Commit Blocked! @filetype@-file included!"
-    
-    deployOnTag:
-        Description: deploys locally or to configured hosts on a pushed tag
-                     For remote deploy, have a look at the note on foot of this document.
-        Depends Config: deployOnTagTargets = "local@/usr/local/src/repo1,/home/user/.ssh/id_rsa@remotehostname"
-
-    deployOnPush:
-        Description: deploys locally or to configured hosts on push
-                     For remote deploy, have a look at the note on foot of this document.
-        Depends Config: deployOnPushTargets = "local@/usr/local/src/repo1,/home/user/.ssh/id_rsa@remotehostname"
-
-
-    publishHomeRepo:
-        Description: specific script to export a cleaned version of my home repo.
-                     maybe usable as example.
-
-    sendEmail:
-        Example script, I just added the switch for.
-        For doc, have a look at the post-receive_email scipt.
-        It's well commented and a great example for all kind of hooks.
+    validation
+        Description: Validates given filetype
 
 
 ####################################

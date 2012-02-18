@@ -1,7 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 # Path to hooks
-hooks_path="/usr/local/share/git-hooks"
+hooks_path="/share/projects/live-repos/git-hooks/hooks"
+
+# Get infos from stdin
+read oldrev newrev refname
 
 # Colors for nice output
 Normal='\e[0m'
@@ -9,12 +12,38 @@ Green='\e[0;32m'
 Yellow='\e[0;33m'
 Red='\e[0;31m'
 
-# Get infos from stdin
-read oldrev newrev refname
+ORIGINAL_IFS=$IFS
+STATUS=true
 
-# Load custom hooks, if available
-if [ -r "${hooks_path}/$( basename ${0} )" ]
-then
-    . ${hooks_path}/$( basename ${0} )
-fi
+affected_files()
+{
+    for extension in ${@}
+    do
+        for comitted_file in $( git diff-tree -r ${oldrev}..${newrev} | awk {'print substr($0, index($0,$6))'} )
+        do
+            if [ "${comitted_file##*.}" = "$extension" ]
+            then
+                echo "$comitted_file"
+            fi
+        done
+    done
+}
+
+commited_file()
+{
+    sourcefile="${1}"
+    git show ${newrev}:"${sourcefile}"
+}
+
+# load available custom hooks
+for custom_hook in $( ls "${hooks_path}/"$( basename ${0} ).* 2> /dev/null )
+do
+    . "${custom_hook}"
+    if [ $? != 0 ]
+    then
+        STATUS=false
+    fi
+done
+
+${STATUS}
 

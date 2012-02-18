@@ -30,26 +30,6 @@ then
     exit 0
 fi
 
-affected_files()
-{
-    for extension in ${@}
-    do
-        for comitted_file in $( git diff-tree -r ${oldrev}..${newrev} | awk {'print substr($0, index($0,$6))'} )
-        do
-            if [ "${comitted_file##*.}" = "$extension" ]
-            then
-                echo "$comitted_file"
-            fi
-        done
-    done
-}
-
-commited_file()
-{
-    sourcefile="${1}"
-    git show ${newrev}:"${sourcefile}"
-}
-
 validate()
 {
     module="${1}"
