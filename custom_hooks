@@ -35,6 +35,16 @@ commited_file()
     git show ${newrev}:"${sourcefile}"
 }
 
+# load local dot hooks (e.g. local update.gitolite)
+for local_hook in $( ls hooks/$( basename ${0} ).* 2> /dev/null )
+do
+    ${local_hook} "${oldrev}" "${newrev}" "${refname}"
+    if [ $? != 0 ]
+    then
+        STATUS=false
+    fi
+done
+
 # load available custom hooks
 for custom_hook in $( ls "${hooks_path}/"$( basename ${0} ).* 2> /dev/null )
 do

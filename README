@@ -1,17 +1,39 @@
-These are a few of my git-hooks. Have a look at the Overview at the bottom.
+These are a few of my git-hooks.
+If you have nice hooks that might be helpful, please write a mail (simon.codingmonkey@googlemail.com)
 
 To activate serverside hooks, 
-    1) get include "custom_hook"-hook  
-    2) to activate the hooks needed, use something like this in your repos config file:
-
-    [hook]
-        validation = xml, php 
-
+    1) adjust "hooks_path" in "custom_hook" loader script
+    2) rename existing hooks with dot-scheme (e.g. update -> update.gitosis)
+    3) link custom_hook loader as update/pre-receive/... 
+    4) activate the wished hooks via repo config (see example below) 
 
 Overview:
-    
+
     validation
         Description: Validates given filetype
+        Type: pre-receive
+        Depends: php-cli, xmllint, ...
+
+    extension
+        Description: Checks for 'forbidden' extensions
+        Type: pre-receive
+
+    chainpush
+        Description: Does chainpush to other repos/hosts (e.g. github)
+        Type: post-receive
+
+    deploy
+        Description: deploy via git 
+        Type: post-receive 
+
+
+Example config for hooks (put this in the repos config):
+    
+    [hook]
+        validation = xml, php 
+        chainpush = git@github.com/simonschiele/awesome.git, git@psaux.de:awesome.git 
+        extension = doc, xls
+        deploy = local@/var/www/project2, /etc/keys/deployTestProject.pub@psaux.de
 
 
 ####################################

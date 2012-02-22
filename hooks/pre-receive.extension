@@ -1,0 +1,46 @@
+#!/bin/bash
+
+NAME="pre-receive.extension"
+ORIGINAL_IFS=$IFS
+HOOK_STATUS=true
+ACTIVE=true
+
+call="$( basename ${0} )"
+if [ "${call}" = "${NAME}" ]
+then
+    echo "Please don't call this hook directly. It doesn't make sense."
+    echo "Use the 'custom_hooks' loader or source this script like this:'"
+    echo ". ./hooks/${call}"
+    exit 1
+fi
+
+extension=$(git config hook.extension | sed 's|,| |g' | sed 's|[ ]\+| |g')
+if [ "${extension}" = "" ] || [ "${extension}" = "false" ]
+then
+    ACTIVE=false
+fi
+
+if ( $ACTIVE )
+then
+    found=false
+    
+    for entry in $extension
+    do
+        affected_files=$( affected_files ${entry} )
+        
+        if [ -n "$affected_files" ]
+        then
+            if ! ( $found )
+            then
+                echo -e "\n> Unwanted Extensions found"
+                found=true
+            fi
+        
+            echo -e "${Red}${entry}:${Normal}" 
+            echo -e "${affected_files}\n"
+        fi
+    done
+fi
+
+${HOOK_STATUS}
+

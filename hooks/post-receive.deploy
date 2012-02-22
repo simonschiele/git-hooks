@@ -1,0 +1,86 @@
+#!/bin/bash
+
+NAME="post-receive.deploy"
+ORIGINAL_IFS=$IFS
+HOOK_STATUS=true
+ACTIVE=true
+
+call="$( basename ${0} )"
+if [ "${call}" = "${NAME}" ]
+then
+    echo "Please don't call this hook directly. It doesn't make sense."
+    echo "Use the 'custom_hooks' loader or source this script like this:'"
+    echo ". ./hooks/${call}"
+    exit 1
+fi
+
+deploy=$(git config hook.deploy | sed 's|,| |g' | sed 's|[ ]\+| |g')
+if [ "${deploy}" = "" ] || [ "${deploy}" = "false" ]
+then
+    ACTIVE=false
+fi
+
+deploy_local() {
+    repo_dir="${1}"
+    deployStatus=true
+    
+    echo -e "\n> Deploying locally on ${repo_dir}"
+    cd "$repo_dir"
+    unset GIT_DIR
+    if ( git pull )
+    then
+        echo -e "${Green}Deployed SUCCESSFUL${Normal}\n"
+    else
+        echo -e "${Red}Something went wrong. Please check repo state manually.${Normal}\n"
+        deployStatus=false
+    fi
+    cd ..
+    
+    return $( $deployStatus )
+}
+    
+deploy_remote() {
+    deployKey="${1}"
+    deployHost="${2}" 
+    deployStatus=true
+
+    echo -e "\n> Deploying remote on ${deployHost}"
+    if ! [ -r "$deployKey" ]
+    then
+        echo -e "${Red}Error:${Normal} Could not read deploy key ${deployKey}\n" 
+        deployStatus=false
+    else
+        echo
+        eval `ssh-agent` >/dev/null 
+        ssh-add ${deployKey} >/dev/null 2>&1
+        if ( ssh -o "StrictHostKeyChecking no" -l deploy ${deployHost} "echo -n" )
+        then
+            echo -e "${Green}Deployed SUCCESSFUL${Normal}\n"
+        else
+            echo -e "${Red}Something went wrong. Please check repo state manually.${Normal}\n"
+            deployStatus=false
+        fi
+        kill -9 $SSH_AGENT_PID
+    fi
+    
+    return $( $deployStatus )
+}
+    
+if ( $ACTIVE )
+then
+    for entry in $deploy
+    do
+        deploykey=$( echo $entry | cut -f'1' -d'@' )
+        host_or_dir=$( echo $entry | cut -f'2' -d'@' ) 
+    
+        if [[ "$deploykey" =~ "local" ]]
+        then
+            deploy_local "$host_or_dir"
+        else
+            deploy_remote "$deploykey" "$host_or_dir"
+        fi
+    done
+fi
+
+${HOOK_STATUS}
+

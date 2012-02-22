@@ -1,0 +1,48 @@
+#!/bin/bash
+
+NAME="post-receive.chainpush"
+ORIGINAL_IFS=$IFS
+HOOK_STATUS=true
+ACTIVE=true
+
+call="$( basename ${0} )"
+if [ "${call}" = "${NAME}" ]
+then
+    echo "Please don't call this hook directly. It doesn't make sense."
+    echo "Use the 'custom_hooks' loader or source this script like this:'"
+    echo ". ./hooks/${call}"
+    exit 1
+fi
+
+chainpush=$(git config hook.chainpush | sed 's|,| |g' | sed 's|[ ]\+| |g')
+if [ "${chainpush}" = "" ] || [ "${chainpush}" = "false" ]
+then
+    ACTIVE=false
+fi
+    
+if ( $ACTIVE )
+then
+    for entry in $chainpush
+    do
+        repo_name=$( echo "${entry}" | cut -f'2' -d':' )
+        domain=$( echo "${entry}" | sed 's|^.*@\(.*\):.*$|\1|g' )
+        origin="${domain}_${repo_name}"
+        echo -e "\n> Chainpushing repo '${repo_name}' to '${domain}'"
+        
+        if ! ( grep -q "remote \"${origin}\"" config )
+        then
+            echo "remote origin not found. creating it." 
+            git remote add "${origin}" "${entry}"
+        fi
+
+        if ( git push "${origin}" ${refname:t} )
+        then
+            echo -e "${Green}Push SUCCESSFUL${Normal}\n"
+        else
+            echo -e "${Red}Could not push '${entry}'${Normal}\n"
+        fi
+    done
+fi
+
+${HOOK_STATUS}
+

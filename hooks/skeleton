@@ -1,0 +1,29 @@
+#!/bin/bash
+
+NAME="post-receive.hookname"
+ORIGINAL_IFS=$IFS
+HOOK_STATUS=true
+ACTIVE=true
+
+call="$( basename ${0} )"
+if [ "${call}" = "${NAME}" ]
+then
+    echo "Please don't call this hook directly. It doesn't make sense."
+    echo "Use the 'custom_hooks' loader or source this script like this:'"
+    echo ". ./hooks/${call}"
+    exit 1
+fi
+
+configflag=$(git config hook.configflag | sed 's|,| |g' | sed 's|[ ]\+| |g')
+if [ "${configflag}" = "" ] || [ "${configflag}" = "false" ]
+then
+    ACTIVE=false
+fi
+    
+if ( $ACTIVE )
+then
+    # do stuff...
+fi
+
+${HOOK_STATUS}
+
