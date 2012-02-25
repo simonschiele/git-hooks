@@ -14,7 +14,7 @@ then
     exit 1
 fi
 
-extension=$(git config hook.extension | sed 's|,| |g' | sed 's|[ ]\+| |g')
+extension=$(git config hooks.extension | sed 's|,| |g' | sed 's|[ ]\+| |g')
 if [ "${extension}" = "" ] || [ "${extension}" = "false" ]
 then
     ACTIVE=false

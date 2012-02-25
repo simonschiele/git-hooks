@@ -14,7 +14,7 @@ then
     exit 1
 fi
 
-configflag=$(git config hook.configflag | sed 's|,| |g' | sed 's|[ ]\+| |g')
+configflag=$(git config hooks.configflag | sed 's|,| |g' | sed 's|[ ]\+| |g')
 if [ "${configflag}" = "" ] || [ "${configflag}" = "false" ]
 then
     ACTIVE=false

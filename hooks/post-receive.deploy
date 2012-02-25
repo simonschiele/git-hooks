@@ -14,7 +14,7 @@ then
     exit 1
 fi
 
-deploy=$(git config hook.deploy | sed 's|,| |g' | sed 's|[ ]\+| |g')
+deploy=$(git config hooks.deploy | sed 's|,| |g' | sed 's|[ ]\+| |g')
 if [ "${deploy}" = "" ] || [ "${deploy}" = "false" ]
 then
     ACTIVE=false

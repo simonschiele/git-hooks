@@ -22,7 +22,7 @@ then
     exit 1
 fi
 
-validation=$(git config hook.validation | sed 's|,| |g' | sed 's|[ ]\+| |g')
+validation=$(git config hooks.validation | sed 's|,| |g' | sed 's|[ ]\+| |g')
 if [ "${validation}" = "" ] || [ "${validation}" = "false" ]
 then
     ACTIVE=false

@@ -14,7 +14,7 @@ then
     exit 1
 fi
 
-chainpush=$(git config hook.chainpush | sed 's|,| |g' | sed 's|[ ]\+| |g')
+chainpush=$(git config hooks.chainpush | sed 's|,| |g' | sed 's|[ ]\+| |g')
 if [ "${chainpush}" = "" ] || [ "${chainpush}" = "false" ]
 then
     ACTIVE=false

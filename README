@@ -29,7 +29,7 @@ Overview:
 
 Example config for hooks (put this in the repos config):
     
-    [hook]
+    [hooks]
         validation = xml, php 
         chainpush = git@github.com/simonschiele/awesome.git, git@psaux.de:awesome.git 
         extension = doc, xls
