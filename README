@@ -6,10 +6,6 @@ To activate serverside hooks:
     2) rename existing hooks with dot-scheme (e.g. update -> update.gitosis)
     3) link custom_hook loader as update/pre-receive/... 
     4) activate the wished hooks via repo config (see example below) 
-    
-For gitolite you can just point $GL_PACKAGE_HOOKS in your .gitolite.rc to the loader directory and
-link gitolites update hook as "loader/update.gitolite".
-
 
 Overview:
 
