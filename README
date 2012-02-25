@@ -33,7 +33,7 @@ Example config for hooks (put this in the repos config):
         validation = xml, php 
         chainpush = git@github.com/simonschiele/awesome.git, git@psaux.de:awesome.git 
         extension = doc, xls
-        deploy = local@/var/www/project2, /etc/keys/deployTestProject.pub@psaux.de
+        deploy = local@/var/www/project2, /etc/keys/deployTestProject.priv@psaux.de
 
 
 ####################################
