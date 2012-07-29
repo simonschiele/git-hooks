@@ -35,7 +35,7 @@ then
             git remote add "${origin}" "${entry}"
         fi
         
-        if ( git fetch && git push --mirror "${origin}" )
+        if ( git push --mirror "${origin}" )
         then
             echo -e "${Green}Push SUCCESSFUL${Normal}\n"
         else
