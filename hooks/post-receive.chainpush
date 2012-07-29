@@ -34,8 +34,8 @@ then
             echo "remote origin not found. creating it." 
             git remote add "${origin}" "${entry}"
         fi
-
-        if ( git push --mirror "${origin}" ${refname:t} )
+        
+        if ( git fetch && git push --mirror "${origin}" )
         then
             echo -e "${Green}Push SUCCESSFUL${Normal}\n"
         else
